@@ -1,13 +1,9 @@
 import { ChangeEvent } from "react";
-// import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
 function App() {
 
-
-  /* async function greet() {
-    await invoke("open_file", { path: "Haki" })
-  } */
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -18,6 +14,7 @@ function App() {
 
     console.log("File size:", bytes.length)
     console.log(bytes)
+    await invoke("open_file", { bytes })
   }
 
   return (
