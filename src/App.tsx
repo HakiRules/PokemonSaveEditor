@@ -14,7 +14,8 @@ function App() {
 
     console.log("File size:", bytes.length)
     console.log(bytes)
-    await invoke("open_file", { bytes })
+    const result = await invoke("open_file", { bytes })
+    console.log("Result", result)
   }
 
   return (

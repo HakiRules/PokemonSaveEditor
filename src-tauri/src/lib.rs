@@ -1,24 +1,22 @@
-const SAVE_B_OFFSET: usize = 57344;
-const SECTION_SIZE: usize = 4096;
-const SECTION_COUNT: usize = 14;
+mod gen3;
+mod gen3constants;
+
+use crate::gen3::Gen3Data;
+
+const GEN_4_SIZE: usize = 524410;
+const GEN_3_SIZE: usize = 131088;
 
 #[tauri::command]
-fn open_file(bytes: Vec<u8>) -> String {
-    let save_b = &bytes[SAVE_B_OFFSET..SAVE_B_OFFSET * 2];
-    let mut sections: Vec<&[u8]> = Vec::with_capacity(14);
-    for index in 0..SECTION_COUNT {
-        let start = index * SECTION_SIZE;
-        sections.push(&save_b[start..start + SECTION_SIZE]);
+fn open_file(bytes: Vec<u8>) -> Gen3Data {
+    let save_length = bytes.len();
+    if save_length == GEN_3_SIZE || save_length < GEN_4_SIZE {
+        gen3::parse_gen_3(bytes)
+    } else {
+        Gen3Data {
+            team: Vec::new(),
+            trainer_nick: String::new(),
+        }
     }
-    //TODO:
-    // - Add checksum
-    // - Split data
-    for section in sections {
-        let section_id = u16::from_le_bytes(section[0x0FF4..0x0FF6].try_into().unwrap());
-        println!("{}", section_id)
-    }
-
-    "Hello, {}! You've been greeted from Rust!".to_string()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
