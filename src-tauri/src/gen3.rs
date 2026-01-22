@@ -28,7 +28,8 @@ pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
     }
     //TODO:
     // - Add checksum
-
+    // - Decrypt pokemon team data
+    // - Get pokemon species from decrypted data
     for section in sections {
         let section_id = u16::from_le_bytes(section[0x0FF4..0x0FF6].try_into().unwrap());
         sections_map.insert(section_id, section);

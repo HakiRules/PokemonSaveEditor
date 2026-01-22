@@ -1,21 +1,21 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import { Gen3Data } from "./types/Gen3";
 
 function App() {
 
+  const [gen3Data, setGen3Data] = useState<Gen3Data>()
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
-    console.log(file)
+
     const buffer = await file.arrayBuffer()
     const bytes = new Uint8Array(buffer)
 
-    console.log("File size:", bytes.length)
-    console.log(bytes)
-    const result = await invoke("open_file", { bytes })
-    console.log("Result", result)
+    const result = await invoke<Gen3Data>("open_file", { bytes })
+    if (result) setGen3Data(result)
   }
 
   return (
@@ -30,6 +30,14 @@ function App() {
           accept=".sav"
         />
       </label>
+      <div>
+        <div>
+          {gen3Data?.trainer_nick && <label>{gen3Data?.trainer_nick}</label>}
+        </div>
+        <div className="flex gap-1">
+          {gen3Data?.team?.map(itm => <label key={itm.nick}>{itm.nick}</label>)}
+        </div>
+      </div>
     </main>
   );
 }
