@@ -1,8 +1,8 @@
 pub const SAVE_B_OFFSET: usize = 57344;
 pub const SECTION_SIZE: usize = 4096;
 pub const SECTION_COUNT: usize = 14;
-pub const TRAINER_SECTION_ID: u16 = 0;
-pub const TEAM_SECTION_ID: u16 = 1;
+pub const TRAINER_SECTION_ID: u8 = 0;
+pub const TEAM_SECTION_ID: u8 = 1;
 
 pub const CHARACTER_MAP: [char; 256] = {
     let mut map = ['?'; 256];
@@ -61,3 +61,30 @@ pub const CHARACTER_MAP: [char; 256] = {
     map[0xEE] = 'z';
     map
 };
+
+pub const BLOCK_ORDER: [[char; 4]; 24] = [
+    ['A', 'B', 'C', 'D'],
+    ['A', 'B', 'D', 'C'],
+    ['A', 'C', 'B', 'D'],
+    ['A', 'C', 'D', 'B'],
+    ['A', 'D', 'B', 'C'],
+    ['A', 'D', 'C', 'B'],
+    ['B', 'A', 'C', 'D'],
+    ['B', 'A', 'D', 'C'],
+    ['B', 'C', 'A', 'D'],
+    ['B', 'C', 'D', 'A'],
+    ['B', 'D', 'A', 'C'],
+    ['B', 'D', 'C', 'A'],
+    ['C', 'A', 'B', 'D'],
+    ['C', 'A', 'D', 'B'],
+    ['C', 'B', 'A', 'D'],
+    ['C', 'B', 'D', 'A'],
+    ['C', 'D', 'A', 'B'],
+    ['C', 'D', 'B', 'A'],
+    ['D', 'A', 'B', 'C'],
+    ['D', 'A', 'C', 'B'],
+    ['D', 'B', 'A', 'C'],
+    ['D', 'B', 'C', 'A'],
+    ['D', 'C', 'A', 'B'],
+    ['D', 'C', 'B', 'A'],
+];

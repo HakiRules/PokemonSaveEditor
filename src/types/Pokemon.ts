@@ -1,4 +1,4 @@
 export type Pokemon = {
   nick: string,
-  species: string,
+  species: number,
 }

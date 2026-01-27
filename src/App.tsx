@@ -15,6 +15,7 @@ function App() {
     const bytes = new Uint8Array(buffer)
 
     const result = await invoke<Gen3Data>("open_file", { bytes })
+    console.log(result)
     if (result) setGen3Data(result)
   }
 
@@ -31,10 +32,10 @@ function App() {
         />
       </label>
       <div>
-        <div>
+        <div className="flex justify-center">
           {gen3Data?.trainer_nick && <label>{gen3Data?.trainer_nick}</label>}
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 justify-center">
           {gen3Data?.team?.map(itm => <label key={itm.nick}>{itm.nick}</label>)}
         </div>
       </div>
