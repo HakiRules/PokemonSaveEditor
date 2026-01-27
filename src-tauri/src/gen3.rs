@@ -52,6 +52,8 @@ pub struct Pokemon {
     friendship: u8,
     moves: Vec<Move>,
     contest: ContestData,
+    pokerus: u8,
+    met_location: u8,
 }
 
 pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
@@ -63,13 +65,7 @@ pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
         let start = index * SECTION_SIZE;
         sections.push(&save_b[start..start + SECTION_SIZE]);
     }
-    //TODO:
-    // - Add checksum
-    // - get bits to a single function
-    // - parse pokerus, met location, origins and ribbons of pokemon
-    // - parse trainer missing info
-    // - parse items
-    // - refactor, split functions and move struct to a single file
+
     for section in sections {
         let section_id = section[0x0FF4];
         sections_map.insert(section_id, section);
@@ -158,16 +154,23 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
             .expect("Pokemon data block not found");
         let attacks_start = attacks_index * 12;
         let attacks_data = &decrypted_data[attacks_start..(attacks_start + 12)];
-        for i in 0..4 {
+        for i in 0..3 {
             let start = i * 2;
+            let end = start + 2;
             let move_id = u16::from_le_bytes(
-                attacks_data[start..2]
+                attacks_data[start..end]
                     .try_into()
                     .expect("attack data too short"),
             );
             let move_pp = attacks_data[8 + i];
-            moves[i].move_id = move_id;
-            moves[i].current_pp = move_pp;
+            let poke_move = moves.get_mut(i);
+            match poke_move {
+                Some(item) => {
+                    item.move_id = move_id;
+                    item.current_pp = move_pp;
+                }
+                None => println!("Error parsing move number {}", i),
+            }
         }
 
         // || EVS & CONDITION DATA EXTRACT ||
@@ -200,6 +203,8 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
             experience,
             friendship,
             moves,
+            pokerus: misc_data[0],
+            met_location: misc_data[1],
             ev: Stats {
                 hp: evs_data[0],
                 attk: evs_data[1],
