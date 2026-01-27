@@ -25,12 +25,33 @@ pub struct Stats {
 }
 
 #[derive(Serialize)]
+pub struct Move {
+    move_id: u16,
+    current_pp: u8,
+    pp_bonus: u8,
+}
+
+#[derive(Serialize)]
+pub struct ContestData {
+    coolness: u8,
+    beauty: u8,
+    cuteness: u8,
+    smartness: u8,
+    toughness: u8,
+    feel: u8,
+}
+
+#[derive(Serialize)]
 pub struct Pokemon {
     nick: String,
     species: u16,
     item: u16,
     ev: Stats,
     iv: Stats,
+    experience: u32,
+    friendship: u8,
+    moves: Vec<Move>,
+    contest: ContestData,
 }
 
 pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
@@ -44,7 +65,11 @@ pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
     }
     //TODO:
     // - Add checksum
-    // - Get pokemon species from decrypted data
+    // - get bits to a single function
+    // - parse pokerus, met location, origins and ribbons of pokemon
+    // - parse trainer missing info
+    // - parse items
+    // - refactor, split functions and move struct to a single file
     for section in sections {
         let section_id = section[0x0FF4];
         sections_map.insert(section_id, section);
@@ -98,6 +123,10 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
         let order = BLOCK_ORDER
             .get((p_id % 24) as usize)
             .expect("Error retrieving BlOCK_ORDER");
+
+        let mut moves: Vec<Move> = Vec::with_capacity(4);
+
+        // || GROWTH DATA EXTRACT ||
         let growth_index = order
             .iter()
             .position(|&c| c == 'A')
@@ -107,10 +136,41 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
         let growth_data = &decrypted_data[growth_start..(growth_start + 12)];
 
         let species_id =
-            u16::from_le_bytes(growth_data[0..2].try_into().expect("growthData too short"));
+            u16::from_le_bytes(growth_data[0..2].try_into().expect("growth data too short"));
         let item_id =
-            u16::from_le_bytes(growth_data[2..4].try_into().expect("growthData too short"));
+            u16::from_le_bytes(growth_data[2..4].try_into().expect("growth data too short"));
+        let experience = u32::from_le_bytes(growth_data[4..8].try_into().unwrap());
+        let pp_bonuses = growth_data[8];
 
+        for i in (0..6).step_by(2) {
+            moves.push(Move {
+                move_id: 0,
+                current_pp: 0,
+                pp_bonus: get_bits_from_u8(pp_bonuses, i, 2),
+            });
+        }
+        let friendship = growth_data[9];
+
+        // || ATTACKS DATA EXTRACT ||
+        let attacks_index = order
+            .iter()
+            .position(|&c| c == 'B')
+            .expect("Pokemon data block not found");
+        let attacks_start = attacks_index * 12;
+        let attacks_data = &decrypted_data[attacks_start..(attacks_start + 12)];
+        for i in 0..4 {
+            let start = i * 2;
+            let move_id = u16::from_le_bytes(
+                attacks_data[start..2]
+                    .try_into()
+                    .expect("attack data too short"),
+            );
+            let move_pp = attacks_data[8 + i];
+            moves[i].move_id = move_id;
+            moves[i].current_pp = move_pp;
+        }
+
+        // || EVS & CONDITION DATA EXTRACT ||
         let evs_index = order
             .iter()
             .position(|&c| c == 'C')
@@ -118,6 +178,7 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
         let evs_start = evs_index * 12;
         let evs_data = &decrypted_data[evs_start..(evs_start + 12)];
 
+        // || MISCELLANOUS DATA EXTRACT ||
         let misc_index = order
             .iter()
             .position(|&c| c == 'D')
@@ -136,6 +197,9 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
             nick: nickname,
             species: species_id,
             item: item_id,
+            experience,
+            friendship,
+            moves,
             ev: Stats {
                 hp: evs_data[0],
                 attk: evs_data[1],
@@ -147,14 +211,22 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
                 ability,
             },
             iv: Stats {
-                hp: get_bits(iv_value, 0),
-                attk: get_bits(iv_value, 5),
-                s_attk: get_bits(iv_value, 10),
-                def: get_bits(iv_value, 15),
-                s_def: get_bits(iv_value, 20),
-                speed: get_bits(iv_value, 25),
+                hp: get_bits_from_u32(iv_value, 0, 5),
+                attk: get_bits_from_u32(iv_value, 5, 5),
+                s_attk: get_bits_from_u32(iv_value, 10, 5),
+                def: get_bits_from_u32(iv_value, 15, 5),
+                s_def: get_bits_from_u32(iv_value, 20, 5),
+                speed: get_bits_from_u32(iv_value, 25, 5),
                 is_egg,
                 ability,
+            },
+            contest: ContestData {
+                coolness: evs_data[6],
+                beauty: evs_data[7],
+                cuteness: evs_data[8],
+                smartness: evs_data[9],
+                toughness: evs_data[10],
+                feel: evs_data[11],
             },
         })
     }
@@ -172,6 +244,9 @@ fn decrypt_pokemon_data(data: &[u8], key: u32) -> [u8; 48] {
     decrypted
 }
 
-fn get_bits(value: u32, offset: u32) -> u8 {
-    ((value >> offset) & ((1 << 5) - 1)) as u8
+fn get_bits_from_u32(value: u32, offset: u32, width: u32) -> u8 {
+    ((value >> offset) & ((1 << width) - 1)) as u8
+}
+fn get_bits_from_u8(value: u8, offset: u8, width: u8) -> u8 {
+    ((value >> offset) & ((1 << width) - 1)) as u8
 }
