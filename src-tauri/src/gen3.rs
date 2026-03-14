@@ -1,10 +1,12 @@
 use serde::Serialize;
+use std::collections::HashMap;
 
 use crate::gen3constants::{
     BLOCK_ORDER, CHARACTER_MAP, SAVE_B_OFFSET, SECTION_COUNT, SECTION_SIZE, TEAM_SECTION_ID,
     TRAINER_SECTION_ID,
 };
-use std::collections::HashMap;
+use crate::species_converter::get_national3;
+use crate::species_name::SPECIES_NAMES;
 
 #[derive(Serialize)]
 pub struct Gen3Data {
@@ -45,6 +47,7 @@ pub struct ContestData {
 pub struct Pokemon {
     nick: String,
     species: u16,
+    species_name: String,
     item: u16,
     ev: Stats,
     iv: Stats,
@@ -196,9 +199,12 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
         let is_egg = ((iv_value >> 30) & 1) != 0;
         let ability = ((iv_value >> 31) & 1) as u8;
 
+        let national_id = get_national3(species_id);
+
         pokemon_team.push(Pokemon {
             nick: nickname,
-            species: species_id,
+            species: national_id,
+            species_name: String::from(SPECIES_NAMES[national_id as usize]),
             item: item_id,
             experience,
             friendship,

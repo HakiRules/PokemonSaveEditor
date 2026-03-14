@@ -1,5 +1,7 @@
 mod gen3;
 mod gen3constants;
+mod species_converter;
+mod species_name;
 
 use crate::gen3::Gen3Data;
 

@@ -1,6 +1,6 @@
-import { Pokemon } from "./Pokemon";
+import { Pokemon } from "./Pokemon"
 
 export type Gen3Data = {
-  trainer_nick: string,
-  team: Pokemon[],
+  trainer_nick: string
+  team: Pokemon[]
 }

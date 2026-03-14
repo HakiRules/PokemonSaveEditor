@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { Gen3Data } from "./types/Gen3";
+import { PokemonButton } from "./components/PokemonButton";
 
 function App() {
 
@@ -36,7 +37,9 @@ function App() {
           {gen3Data?.trainer_nick && <label>{gen3Data?.trainer_nick}</label>}
         </div>
         <div className="flex gap-1 justify-center">
-          {gen3Data?.team?.map(itm => <label key={itm.nick}>{itm.nick}</label>)}
+          {gen3Data?.team?.map(itm =>
+            <PokemonButton pokemon={itm} key={itm.nick} />
+          )}
         </div>
       </div>
     </main>
