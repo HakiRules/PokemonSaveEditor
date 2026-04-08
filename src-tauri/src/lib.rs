@@ -16,7 +16,7 @@ fn open_file(bytes: Vec<u8>) -> Gen3Data {
     } else {
         Gen3Data {
             team: Vec::new(),
-            trainer_nick: String::new(),
+            trainer: Option::None,
         }
     }
 }

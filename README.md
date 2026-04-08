@@ -19,7 +19,6 @@ Parsing:
 - Add checksum
 - Get bits to a single function
 - Parse origins and ribbons of pokemon
-- Parse trainer missing info
 - Parse items
 - Parse box data
 - Refactor, split functions and move struct to a single file

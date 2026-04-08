@@ -10,8 +10,20 @@ use crate::species_name::SPECIES_NAMES;
 
 #[derive(Serialize)]
 pub struct Gen3Data {
-    pub trainer_nick: String,
+    pub trainer: Option<Player>,
     pub team: Vec<Pokemon>,
+}
+
+#[derive(Serialize)]
+pub struct Player {
+    nick: String,
+    gender: bool,
+    money: u32,
+    trainer_id: u16,
+    secret_id: u16,
+    time_played: u32,
+    badges: u32,
+    security_key: u32,
 }
 
 #[derive(Serialize)]
@@ -74,9 +86,50 @@ pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
         sections_map.insert(section_id, section);
     }
 
-    let trainer_nick = parse_name(sections_map.get(&TRAINER_SECTION_ID).unwrap(), 0, 7);
-    let team = parse_pokemon_team(sections_map.get(&TEAM_SECTION_ID).unwrap());
-    Gen3Data { trainer_nick, team }
+    let trainer_section = sections_map.get(&TRAINER_SECTION_ID).unwrap();
+    let mut player = parse_trainer_info(trainer_section);
+    let team: Vec<Pokemon> = parse_pokemon_team(sections_map.get(&TEAM_SECTION_ID).unwrap());
+    let money = parse_money(
+        sections_map.get(&TEAM_SECTION_ID).unwrap(),
+        player.security_key,
+    );
+    player.money = money;
+
+    let badges = trainer_section[21];
+    player.badges = badges.count_ones();
+
+    Gen3Data {
+        trainer: Some(player),
+        team,
+    }
+}
+
+fn parse_money(section: &[u8], security_key: u32) -> u32 {
+    let money_section = u32::from_le_bytes(section[1936..(1936 + 4)].try_into().unwrap());
+    money_section ^ security_key
+}
+
+fn parse_trainer_info(section: &[u8]) -> Player {
+    let trainer_nick = parse_name(section, 0, 7);
+    let gender = *section.get(8).unwrap() == 0;
+    let trainer_id = u16::from_le_bytes(section[10..12].try_into().unwrap());
+    let secret_id = u16::from_le_bytes(section[12..14].try_into().unwrap());
+    let security_key = u32::from_le_bytes(section[172..176].try_into().unwrap());
+
+    let hours = u16::from_le_bytes(section[14..16].try_into().unwrap());
+    let minutes = section[16];
+    let seconds = section[17];
+
+    Player {
+        nick: trainer_nick,
+        gender,
+        money: 0,
+        trainer_id,
+        secret_id,
+        time_played: (hours as u32 * 3600) + (minutes as u32 * 60) + seconds as u32,
+        badges: 0,
+        security_key,
+    }
 }
 
 fn parse_name(section: &[u8], start: usize, size: usize) -> String {

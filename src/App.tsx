@@ -34,7 +34,7 @@ function App() {
       </label>
       <div>
         <div className="flex justify-center">
-          {gen3Data?.trainer_nick && <label>{gen3Data?.trainer_nick}</label>}
+          {gen3Data?.trainer?.nick && <label>{gen3Data?.trainer?.nick}</label>}
         </div>
         <div className="flex gap-1 justify-center">
           {gen3Data?.team?.map(itm =>
