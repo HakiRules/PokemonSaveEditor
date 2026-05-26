@@ -69,6 +69,7 @@ pub struct Pokemon {
     contest: ContestData,
     pokerus: u8,
     met_location: u8,
+    personality_id: u32,
 }
 
 pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
@@ -264,6 +265,7 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
             moves,
             pokerus: misc_data[0],
             met_location: misc_data[1],
+            personality_id: p_id,
             ev: Stats {
                 hp: evs_data[0],
                 attk: evs_data[1],

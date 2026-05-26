@@ -11,6 +11,7 @@ export type Pokemon = {
   contest: ContestData
   pokerus: number
   met_location: number
+  personality_id: number
 }
 
 export type Stats = {
