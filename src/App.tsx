@@ -2,7 +2,8 @@ import { ChangeEvent, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { Gen3Data } from "./types/Gen3";
-import { PokemonButton } from "./components/PokemonButton";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import { TeamView } from "./components/TeamView";
 
 function App() {
 
@@ -22,27 +23,51 @@ function App() {
 
   return (
     <main className="p-2">
-      <label className="flex w-fit p-2 border border-blue-600 hover:cursor-pointer hover:bg-[#242424]">
-        Browse file
-        <input
-          id="file-input"
-          hidden
-          onChange={handleFile}
-          type="file"
-          accept=".sav"
-        />
-      </label>
-      <div>
-        <div className="flex justify-center">
-          {gen3Data?.trainer?.nick && <label>{gen3Data?.trainer?.nick}</label>}
+      {gen3Data ?
+        <div className="flex flex-col items-center gap-1">
+          <div>
+            {gen3Data?.trainer?.nick && <label>{gen3Data?.trainer?.nick}</label>}
+          </div>
+          <TabGroup className="w-full max-w-225" defaultIndex={0}>
+            <TabList className=" rounded-md flex justify-between gap-1 px-1 py-1 border border-primary-500">
+              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Team</Tab>
+              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">PC</Tab>
+              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Bag</Tab>
+              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Pokedex</Tab>
+              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Trainer</Tab>
+            </TabList>
+            <TabPanels className="py-2">
+              <TabPanel>
+                <TeamView team={gen3Data.team} />
+              </TabPanel>
+              <TabPanel>
+                Content2
+              </TabPanel>
+              <TabPanel>
+                Content3
+              </TabPanel>
+              <TabPanel>
+                Content4
+              </TabPanel>
+              <TabPanel>
+                Content5
+              </TabPanel>
+            </TabPanels>
+          </TabGroup>
         </div>
-        <div className="flex gap-1 justify-center">
-          {gen3Data?.team?.map(itm =>
-            <PokemonButton pokemon={itm} key={itm.nick} />
-          )}
-        </div>
-      </div>
-    </main>
+        :
+        <label className="flex w-fit p-2 border border-blue-600 hover:cursor-pointer hover:bg-[#242424]">
+          Browse file
+          <input
+            id="file-input"
+            hidden
+            onChange={handleFile}
+            type="file"
+            accept=".sav"
+          />
+        </label>
+      }
+    </main >
   );
 }
 
