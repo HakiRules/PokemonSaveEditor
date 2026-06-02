@@ -1,9 +1,9 @@
 mod gen3;
-mod gen3constants;
 mod species_converter;
-mod species_name;
+mod species_types;
 
-use crate::gen3::Gen3Data;
+use gen3::gen3_parser;
+use gen3::gen3_types::Gen3Data;
 
 const GEN_4_SIZE: usize = 524410;
 const GEN_3_SIZE: usize = 131088;
@@ -12,7 +12,7 @@ const GEN_3_SIZE: usize = 131088;
 fn open_file(bytes: Vec<u8>) -> Gen3Data {
     let save_length = bytes.len();
     if save_length == GEN_3_SIZE || save_length < GEN_4_SIZE {
-        gen3::parse_gen_3(bytes)
+        gen3_parser::parse_gen_3(bytes)
     } else {
         Gen3Data {
             team: Vec::new(),

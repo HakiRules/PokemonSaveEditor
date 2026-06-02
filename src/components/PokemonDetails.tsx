@@ -19,13 +19,13 @@ export const PokemonDetails = ({ pokemon, onClose }: PokemonDetailsProps) => {
         <DialogPanel className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 rounded-xl border border-gray-300 bg-white">
           <DialogTitle className="flex items-start gap-4 flex-1">
             <img
-              alt={`${pokemon.nick}-${pokemon.species_name}`}
+              alt={`${pokemon.nick}-${pokemon.species.name}`}
               src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.species}.png`}
               className="w-24 h-24 pixelated"
             />
             <div className="flex-1 items-start">
               <h4 className="text-2xl">
-                {pokemon.species_name}
+                {pokemon.species.name}
               </h4>
               <h5 className="text-gray-500">
                 &quot;{pokemon.nick}&quot;

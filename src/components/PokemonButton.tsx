@@ -42,13 +42,13 @@ export const PokemonButton = ({ pokemon, onClick }: PokemonButtonProps) => {
       key={pokemon.nick}>
       <div className="flex justify-start gap-4 w-full overflow-auto">
         <img
-          alt={`${pokemon.nick}-${pokemon.species_name}`}
-          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.species}.png`}
+          alt={`${pokemon.nick}-${pokemon.species.name}`}
+          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.species.species_id}.png`}
           className="w-24 h-24 pixelated"
         />
         <div className="">
           <h2 className="text-2xl">
-            {pokemon.species_name}
+            {pokemon.species.name}
           </h2>
           <h3 className="text-gray-500">
             &quot;{pokemon.nick}&quot;

@@ -1,0 +1,65 @@
+pub const POKEMON_TYPES: [&str; 19] = [
+    "Unknown", "Normal", "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel",
+    "Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark", "Fairy",
+];
+
+pub const EGG_GROUPS: [&str; 17] = [
+    "Unknown",
+    "Monster",
+    "Water1",
+    "Bug",
+    "Flying",
+    "Ground",
+    "Fairy",
+    "Plant",
+    "Human-Like",
+    "Water3",
+    "Mineral",
+    "Amorphous",
+    "Water2",
+    "Ditto",
+    "Dragon",
+    "Undiscovered",
+    "No Eggs",
+];
+
+pub const GROWTH_RATES: [&str; 8] = [
+    "Unknown",
+    "Erratic",
+    "Fast",
+    "MediumFast",
+    "MediumSlow",
+    "Slow",
+    "Fluctuating",
+    "Custom",
+];
+
+#[derive(serde::Deserialize, serde::Serialize, Clone)]
+pub struct SpeciesInfo {
+    species_id: u16,
+    name: String,
+    hp: u8,
+    attack: u8,
+    defense: u8,
+    speed: u8,
+    sp_attack: u8,
+    sp_defense: u8,
+    type1: u8,
+    type2: u8,
+    catch_rate: u8,
+    base_exp: u16,
+    ev_hp: u8,
+    ev_attack: u8,
+    ev_defense: u8,
+    ev_speed: u8,
+    ev_sp_attack: u8,
+    ev_sp_defense: u8,
+    gender_ratio: i8,
+    egg_cycles: u8,
+    friendship: u8,
+    growth_rate: u8,
+    egg_group1: u8,
+    egg_group2: u8,
+    ability1: u16,
+    ability2: u16,
+}

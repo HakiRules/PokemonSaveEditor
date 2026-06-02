@@ -1,7 +1,6 @@
 export type Pokemon = {
   nick: string
-  species: number
-  species_name: string
+  species: Species
   item: number
   ev: Stats
   iv: Stats
@@ -12,6 +11,35 @@ export type Pokemon = {
   pokerus: number
   met_location: number
   personality_id: number
+}
+
+export type Species = {
+  species_id: number
+  name: string
+  hp: number
+  attack: number
+  defense: number
+  speed: number
+  sp_attack: number
+  sp_defense: number
+  type1: number
+  type2: number
+  catch_rate: number
+  base_exp: number
+  ev_hp: number
+  ev_attack: number
+  ev_defense: number
+  ev_speed: number
+  ev_sp_attack: number
+  ev_sp_defense: number
+  gender_ratio: number
+  egg_cycles: number
+  friendship: number
+  growth_rate: number
+  egg_group1: number
+  egg_group2: number
+  ability1: number
+  ability2: number
 }
 
 export type Stats = {

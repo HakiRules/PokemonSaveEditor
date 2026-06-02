@@ -1,76 +1,14 @@
-use serde::Serialize;
 use std::collections::HashMap;
+use std::fs::File;
+use std::path::Path;
 
-use crate::gen3constants::{
+use super::gen3_types::{ContestData, Gen3Data, Move, Player, Pokemon, Stats};
+use super::gen3constants::{
     BLOCK_ORDER, CHARACTER_MAP, SAVE_B_OFFSET, SECTION_COUNT, SECTION_SIZE, TEAM_SECTION_ID,
     TRAINER_SECTION_ID,
 };
 use crate::species_converter::get_national3;
-use crate::species_name::SPECIES_NAMES;
-
-#[derive(Serialize)]
-pub struct Gen3Data {
-    pub trainer: Option<Player>,
-    pub team: Vec<Pokemon>,
-}
-
-#[derive(Serialize)]
-pub struct Player {
-    nick: String,
-    gender: bool,
-    money: u32,
-    trainer_id: u16,
-    secret_id: u16,
-    time_played: u32,
-    badges: u32,
-    security_key: u32,
-}
-
-#[derive(Serialize)]
-pub struct Stats {
-    hp: u8,
-    attk: u8,
-    s_attk: u8,
-    def: u8,
-    s_def: u8,
-    speed: u8,
-    is_egg: bool,
-    ability: u8,
-}
-
-#[derive(Serialize)]
-pub struct Move {
-    move_id: u16,
-    current_pp: u8,
-    pp_bonus: u8,
-}
-
-#[derive(Serialize)]
-pub struct ContestData {
-    coolness: u8,
-    beauty: u8,
-    cuteness: u8,
-    smartness: u8,
-    toughness: u8,
-    feel: u8,
-}
-
-#[derive(Serialize)]
-pub struct Pokemon {
-    nick: String,
-    species: u16,
-    species_name: String,
-    item: u16,
-    ev: Stats,
-    iv: Stats,
-    experience: u32,
-    friendship: u8,
-    moves: Vec<Move>,
-    contest: ContestData,
-    pokerus: u8,
-    met_location: u8,
-    personality_id: u32,
-}
+use crate::species_types::SpeciesInfo;
 
 pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
     let save_b = &bytes[SAVE_B_OFFSET..SAVE_B_OFFSET * 2];
@@ -89,7 +27,13 @@ pub fn parse_gen_3(bytes: Vec<u8>) -> Gen3Data {
 
     let trainer_section = sections_map.get(&TRAINER_SECTION_ID).unwrap();
     let mut player = parse_trainer_info(trainer_section);
-    let team: Vec<Pokemon> = parse_pokemon_team(sections_map.get(&TEAM_SECTION_ID).unwrap());
+
+    let file = File::open(Path::new("./species.json")).expect("Error reading file");
+    let species_data: Vec<SpeciesInfo> =
+        serde_json::from_reader(file).expect("Error while parsing the file");
+
+    let team: Vec<Pokemon> =
+        parse_pokemon_team(sections_map.get(&TEAM_SECTION_ID).unwrap(), &species_data);
     let money = parse_money(
         sections_map.get(&TEAM_SECTION_ID).unwrap(),
         player.security_key,
@@ -150,7 +94,7 @@ fn parse_name(section: &[u8], start: usize, size: usize) -> String {
     name
 }
 
-fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
+fn parse_pokemon_team(team_section: &[u8], species_data: &[SpeciesInfo]) -> Vec<Pokemon> {
     let mut pokemon_team: Vec<Pokemon> = Vec::new();
     let team_size = team_section[0x0234] as u8;
 
@@ -255,10 +199,11 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
 
         let national_id = get_national3(species_id);
 
+        let pokemon_specie = species_data[national_id as usize].clone();
+
         pokemon_team.push(Pokemon {
             nick: nickname,
-            species: national_id,
-            species_name: String::from(SPECIES_NAMES[national_id as usize]),
+            species: pokemon_specie,
             item: item_id,
             experience,
             friendship,
@@ -266,6 +211,7 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
             pokerus: misc_data[0],
             met_location: misc_data[1],
             personality_id: p_id,
+            is_egg,
             ev: Stats {
                 hp: evs_data[0],
                 attk: evs_data[1],
@@ -273,7 +219,6 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
                 def: evs_data[3],
                 s_def: evs_data[4],
                 speed: evs_data[5],
-                is_egg,
                 ability,
             },
             iv: Stats {
@@ -283,7 +228,6 @@ fn parse_pokemon_team(team_section: &[u8]) -> Vec<Pokemon> {
                 def: get_bits_from_u32(iv_value, 15, 5),
                 s_def: get_bits_from_u32(iv_value, 20, 5),
                 speed: get_bits_from_u32(iv_value, 25, 5),
-                is_egg,
                 ability,
             },
             contest: ContestData {
