@@ -5,7 +5,7 @@ type PokemonButtonProps = {
   onClick: () => void
 }
 
-const natures = [
+/* const natures = [
   "Hardy",
   "Lonely",
   "Brave",
@@ -31,31 +31,30 @@ const natures = [
   "Sassy",
   "Careful",
   "Quirk",
-]
+] */
 
 export const PokemonButton = ({ pokemon, onClick }: PokemonButtonProps) => {
 
   return (
     <button
-      className="cursor-pointer bg-white font-semibold p-2 border border-gray-300 hover:shadow-lg transition-shadow rounded-xl shadow flex flex-col items-center"
+      className="cursor-pointer bg-white font-semibold p-6 border border-gray-300 hover:shadow-lg transition-shadow rounded-xl shadow flex flex-col items-center"
       onClick={onClick}
       key={pokemon.nick}>
-      <div className="flex justify-start gap-4 w-full overflow-auto">
+      <div className="flex items-start justify-between gap-3 w-full overflow-auto">
+        <div className="flex flex-col items-start">
+          <h4 className="text-base capitalize">
+            {pokemon.species.name}
+          </h4>
+          <h3 className="text-gray-500">
+            &quot;{pokemon.nick}&quot;
+          </h3>
+          <p className="text-sm text-muted-foreground">Lv. {pokemon.experience}</p>
+        </div>
         <img
           alt={`${pokemon.nick}-${pokemon.species.name}`}
           src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.species.species_id}.png`}
           className="w-24 h-24 pixelated"
         />
-        <div className="">
-          <h2 className="text-2xl">
-            {pokemon.species.name}
-          </h2>
-          <h3 className="text-gray-500">
-            &quot;{pokemon.nick}&quot;
-          </h3>
-          <p>{natures[pokemon.personality_id % 25]}</p>
-          <p>Lv. {pokemon.experience}</p>
-        </div>
       </div>
     </button>
   )

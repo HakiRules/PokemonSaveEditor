@@ -20,7 +20,7 @@ export const PokemonDetails = ({ pokemon, onClose }: PokemonDetailsProps) => {
           <DialogTitle className="flex items-start gap-4 flex-1">
             <img
               alt={`${pokemon.nick}-${pokemon.species.name}`}
-              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.species}.png`}
+              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.species.species_id}.png`}
               className="w-24 h-24 pixelated"
             />
             <div className="flex-1 items-start">

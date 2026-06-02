@@ -22,19 +22,19 @@ function App() {
   }
 
   return (
-    <main className="p-2">
+    <main className=" min-h-screen p-2 bg-linear-to-br from-blue-50 to-indigo-100 ">
       {gen3Data ?
         <div className="flex flex-col items-center gap-1">
-          <div>
+          <div className="my-6">
             {gen3Data?.trainer?.nick && <label>{gen3Data?.trainer?.nick}</label>}
           </div>
-          <TabGroup className="w-full max-w-225" defaultIndex={0}>
-            <TabList className=" rounded-md flex justify-between gap-1 px-1 py-1 border border-primary-500">
-              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Team</Tab>
-              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">PC</Tab>
-              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Bag</Tab>
-              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Pokedex</Tab>
-              <Tab className="w-full data-selected:bg-primary-500 text-black data-hover:bg-primary-500/20 rounded-md">Trainer</Tab>
+          <TabGroup className="w-full max-w-225 " defaultIndex={0}>
+            <TabList className="bg-muted rounded-md flex justify-between gap-1 px-1 py-1 ">
+              <Tab className="w-full data-selected:bg-white text-black data-hover:bg-white/50 rounded-md">Team</Tab>
+              <Tab className="w-full data-selected:bg-white text-black data-hover:bg-white/50 rounded-md">PC</Tab>
+              <Tab className="w-full data-selected:bg-white text-black data-hover:bg-white/50 rounded-md">Bag</Tab>
+              <Tab className="w-full data-selected:bg-white text-black data-hover:bg-white/50 rounded-md">Pokedex</Tab>
+              <Tab className="w-full data-selected:bg-white text-black data-hover:bg-white/50 rounded-md">Trainer</Tab>
             </TabList>
             <TabPanels className="py-2">
               <TabPanel>

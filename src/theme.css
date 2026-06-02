@@ -1,0 +1,16 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+}
+
+.dark {
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+}
+
+@theme inline {
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+}
